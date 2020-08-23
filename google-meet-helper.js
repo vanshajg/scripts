@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       https://meet.google.com/*
 // @grant       none
-// @version     1.2
+// @version     1.2.1
 // @author      Vanshaj Girotra
 // @description  disable video, Auto mute and auto join in that order. Also shortcut to message window <~
 // @run-at       document-idle
@@ -38,8 +38,6 @@ const getButtonList = () => {
 
 
 const toggle_message = () =>  {
-  
-  console.log("toggle message");
     const button_list = getButtonList();
     button_list.filter(button => button.ariaLabel ==='Chat with everyone')[0].click();
 }
