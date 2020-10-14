@@ -16,9 +16,9 @@ const DISABLE_AUDIO = true;
 const AUTO_JOIN = true;
 const TOGGLE_MESSAGE_WINDOW = true;
 
-const KEY_BINDINGS =  {
-  'message_window': { 
-    key : 'm',
+const KEY_BINDINGS = {
+  'message_window': {
+    key: 'm',
   }
 }
 // ------------------------------
@@ -28,7 +28,7 @@ const KEY_BINDINGS =  {
 const getButtonList = () => {
   const node_list = document.getElementsByTagName('div');
   const button_list = [];
-  for (var i=0;i<node_list.length; i=i+1) {
+  for (let i = 0; i < node_list.length; i = i + 1) {
     if (node_list[i].getAttribute('role') === 'button')
       button_list.push(node_list[i]);
   }
@@ -37,21 +37,20 @@ const getButtonList = () => {
 
 
 
-const toggle_message = () =>  {
-  
-  console.log("toggle message");
-    const button_list = getButtonList();
-    button_list.filter(button => button.ariaLabel ==='Chat with everyone')[0].click();
+const toggle_message = () => {
+
+  const button_list = getButtonList();
+  button_list.filter(button => button.ariaLabel === 'Chat with everyone')[0].click();
 }
 
 
 const meetingMain = () => {
   document.addEventListener('keyup', (e) => {
-    
-    switch(e.key) {
-      case KEY_BINDINGS.message_window.key: 
+
+    switch (e.key) {
+      case KEY_BINDINGS.message_window.key:
         toggle_message();
-      break;
+        break;
     }
   });
 }
@@ -59,35 +58,41 @@ const meetingMain = () => {
 
 const init_screen_main = () => {
   const button_list = getButtonList();
-  
-  if (DISABLE_VIDEO) 
-    button_list[0].click();
-  
-  if (DISABLE_AUDIO) 
-    button_list[1].click();
-  
-  if (AUTO_JOIN) {
-    if (button_list.length === 7)
-      button_list[3].click();
-    else 
-      button_list[4].click();
+  const button_map = {
+    video: null,
+    audio: null,
+    join: null
   }
+  button_list.forEach(button => {
+    if (button.innerText === 'Join now')
+      button_map.join = button;
+    else if (button.ariaLabel && ~button.ariaLabel.indexOf('microphone'))
+      button_map.audio = button;
+    else if (button.ariaLabel && ~button.ariaLabel.indexOf('camera'))
+      button_map.video = button;
+  })
+
+  if (DISABLE_VIDEO)
+    button_map.video && button_map.video.click();
+
+  if (DISABLE_AUDIO)
+    button_map.audio && button_map.audio.click();
+
+  if (AUTO_JOIN)
+    button_map.join && button_map.join.click();
+
 
   if (TOGGLE_MESSAGE_WINDOW) {
     meetingMain();
   }
-  
+
 };
 
 const checkButtonLoad = () => {
-    const button_list = getButtonList();
-    if (button_list.length > 7) {
-      clearInterval(button_check_interval);
-      init_screen_main();
-    }
+  init_screen_main();
+  window.removeEventListener('load', checkButtonLoad);
 }
 
-const button_check_interval = setInterval(checkButtonLoad, 250);
-
+window.addEventListener('load', checkButtonLoad);
 
 
