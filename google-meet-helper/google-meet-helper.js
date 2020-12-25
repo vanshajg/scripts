@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       https://meet.google.com/*
 // @grant       none
-// @version     1.2.2
+// @version     1.2.3
 // @author      Vanshaj Girotra
 // @description  disable video, Auto mute and auto join in that order. Also shortcut to message window <~
 // @run-at       document-idle
@@ -71,12 +71,13 @@ const init_screen_main = () => {
     else if (button.ariaLabel && ~button.ariaLabel.indexOf('camera'))
       button_map.video = button;
   })
+  
 
   if (DISABLE_VIDEO)
-    button_map.video && button_map.video.click();
+    button_list[0].click()
 
   if (DISABLE_AUDIO)
-    button_map.audio && button_map.audio.click();
+    button_list[1].click()
 
   if (AUTO_JOIN)
     button_map.join && button_map.join.click();
@@ -85,11 +86,34 @@ const init_screen_main = () => {
   if (TOGGLE_MESSAGE_WINDOW) {
     meetingMain();
   }
-
+  
 };
 
+
+const checkLoad = () => {
+  const divs = document.getElementsByTagName('div')
+  let loaded = true
+  for (let i=0;i<divs.length; i+=1) {
+    if (divs[i].getAttribute('data-loadingmessage') === 'Loading...') { // :/
+      loaded = false
+    }
+  }
+  return loaded
+}
+
+
+
 const checkButtonLoad = () => {
-  init_screen_main();
+  let clear_interval = false
+  const interval_check = setInterval(() => {
+    const button_list = getButtonList()
+    if (checkLoad()) {
+      //  hackerman
+        clearInterval(interval_check)
+      setTimeout(() => init_screen_main(),100)
+      
+    }
+  }, 100)
   window.removeEventListener('load', checkButtonLoad);
 }
 
