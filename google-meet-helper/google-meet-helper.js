@@ -3,9 +3,9 @@
 // @namespace   Violentmonkey Scripts
 // @match       https://meet.google.com/*
 // @grant       none
-// @version     1.2.3
+// @version     1.2.4
 // @author      Vanshaj Girotra
-// @description  disable video, Auto mute and auto join in that order. Also shortcut to message window <~
+// @description  disable video, Auto mute and auto join in that order. Also switches account (defaults to primary)
 // @run-at       document-idle
 // ==/UserScript==
 
@@ -14,15 +14,14 @@
 const DISABLE_VIDEO = true;
 const DISABLE_AUDIO = true;
 const AUTO_JOIN = true;
-const TOGGLE_MESSAGE_WINDOW = true;
-
-const KEY_BINDINGS = {
-  'message_window': {
-    key: 'm',
-  }
+/**
+ * if your work email is not the first account (authuser = 0) change the authuser below
+ */
+const ACCOUNT_SWITCH = {
+  enable: true,
+  authuser: 0
 }
 // ------------------------------
-
 
 
 const getButtonList = () => {
@@ -36,26 +35,6 @@ const getButtonList = () => {
 }
 
 
-
-const toggle_message = () => {
-
-  const button_list = getButtonList();
-  button_list.filter(button => button.ariaLabel === 'Chat with everyone')[0].click();
-}
-
-
-const meetingMain = () => {
-  document.addEventListener('keyup', (e) => {
-
-    switch (e.key) {
-      case KEY_BINDINGS.message_window.key:
-        toggle_message();
-        break;
-    }
-  });
-}
-
-
 const init_screen_main = () => {
   const button_list = getButtonList();
   const button_map = {
@@ -64,28 +43,24 @@ const init_screen_main = () => {
     join: null
   }
   button_list.forEach(button => {
+    const aria_label = button.getAttribute('aria-label')
     if (button.innerText === 'Join now')
       button_map.join = button;
-    else if (button.ariaLabel && ~button.ariaLabel.indexOf('microphone'))
+    else if (aria_label && ~aria_label.indexOf('microphone'))
       button_map.audio = button;
-    else if (button.ariaLabel && ~button.ariaLabel.indexOf('camera'))
+    else if (aria_label && ~aria_label.indexOf('camera'))
       button_map.video = button;
   })
   
-
+  
   if (DISABLE_VIDEO)
-    button_list[0].click()
+    button_map.video.click()
 
   if (DISABLE_AUDIO)
-    button_list[1].click()
+    button_map.audio.click()
 
-  if (AUTO_JOIN)
+  if (AUTO_JOIN && button_map.audio && button_map.video)   // join iff audio and video buttons have been clicked
     button_map.join && button_map.join.click();
-
-
-  if (TOGGLE_MESSAGE_WINDOW) {
-    meetingMain();
-  }
   
 };
 
@@ -110,13 +85,22 @@ const checkButtonLoad = () => {
     if (checkLoad()) {
       //  hackerman
         clearInterval(interval_check)
-      setTimeout(() => init_screen_main(),100)
+      setTimeout(() => init_screen_main(),500)
       
     }
   }, 100)
-  window.removeEventListener('load', checkButtonLoad);
 }
 
-window.addEventListener('load', checkButtonLoad);
+const main = () => {
+  window.removeEventListener('load', main);
+  const params = new URLSearchParams(location.search);
+  const authuser = params.get('authuser') || '0'
+  if (ACCOUNT_SWITCH.enable && authuser != ACCOUNT_SWITCH.authuser) {
+    params.set('authuser', ACCOUNT_SWITCH.authuser)
+    window.location.search = params.toString()
+  } else {
+    checkButtonLoad()
+  }
+}
 
-
+window.addEventListener('load', main);
