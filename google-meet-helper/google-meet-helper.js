@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       https://meet.google.com/*
 // @grant       none
-// @version     1.2.4
+// @version     1.2.5
 // @author      Vanshaj Girotra
 // @description  disable video, Auto mute and auto join in that order. Also switches account (defaults to primary)
 // @run-at       document-idle
@@ -18,7 +18,7 @@ const AUTO_JOIN = true;
  * if your work email is not the first account (authuser = 0) change the authuser below
  */
 const ACCOUNT_SWITCH = {
-  enable: true,
+  enable: false,
   authuser: 0
 }
 // ------------------------------
