@@ -46,9 +46,9 @@ const init_screen_main = () => {
     const aria_label = button.getAttribute('aria-label')
     if (button.innerText === 'Join now')
       button_map.join = button;
-    else if (aria_label && ~aria_label.indexOf('microphone'))
+    else if (aria_label && ~aria_label.toLowerCase().indexOf('+ d'))
       button_map.audio = button;
-    else if (aria_label && ~aria_label.indexOf('camera'))
+    else if (aria_label && ~aria_label.toLowerCase().indexOf('+ e'))
       button_map.video = button;
   })
   
@@ -67,6 +67,44 @@ const init_screen_main = () => {
 
 const checkLoad = () => {
   const divs = document.getElementsByTagName('div')
+  let loaded = true
+  for (let i=0;i<divs.length; i+=1) {
+    if (divs[i].getAttribute('data-loadingmessage') === 'Loading...') { // :/
+      loaded = false
+    }
+  }
+  return loaded
+}
+
+
+
+const checkButtonLoad = () => {
+  let clear_interval = false
+  const interval_check = setInterval(() => {
+    const button_list = getButtonList()
+    if (checkLoad()) {
+      //  hackerman
+        clearInterval(interval_check)
+      setTimeout(() => init_screen_main(),500)
+      
+    }
+  }, 100)
+}
+
+const main = () => {
+  window.removeEventListener('load', main);
+  const params = new URLSearchParams(location.search);
+  const authuser = params.get('authuser') || '0'
+  if (ACCOUNT_SWITCH.enable && authuser != ACCOUNT_SWITCH.authuser) {
+    params.set('authuser', ACCOUNT_SWITCH.authuser)
+    window.location.search = params.toString()
+  } else {
+    checkButtonLoad()
+  }
+}
+
+window.addEventListener('load', main);
+
   let loaded = true
   for (let i=0;i<divs.length; i+=1) {
     if (divs[i].getAttribute('data-loadingmessage') === 'Loading...') { // :/
