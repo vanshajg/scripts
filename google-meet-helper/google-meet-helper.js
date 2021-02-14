@@ -3,7 +3,7 @@
 // @namespace   Violentmonkey Scripts
 // @match       https://meet.google.com/*
 // @grant       none
-// @version     1.2.5
+// @version     1.2.6
 // @author      Vanshaj Girotra
 // @description  disable video, Auto mute and auto join in that order. Also switches account (defaults to primary)
 // @run-at       document-idle
@@ -46,9 +46,9 @@ const init_screen_main = () => {
     const aria_label = button.getAttribute('aria-label')
     if (button.innerText === 'Join now')
       button_map.join = button;
-    else if (aria_label && ~aria_label.indexOf('microphone'))
+    else if (aria_label && ~aria_label.toLowerCase().indexOf('+ d'))
       button_map.audio = button;
-    else if (aria_label && ~aria_label.indexOf('camera'))
+    else if (aria_label && ~aria_label.toLowerCase().indexOf('+ e'))
       button_map.video = button;
   })
   
