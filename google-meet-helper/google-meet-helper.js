@@ -9,8 +9,9 @@
 // @run-at       document-idle
 // ==/UserScript==
 
-// Original: https://github.com/vanshajg/scripts/tree/master/google-meet-helper
-// Fork:     https://github.com/willsheppard/userscripts/blob/master/google-meet-helper.user.js
+// Original:  https://github.com/vanshajg/scripts/tree/master/google-meet-helper
+// Published: https://greasyfork.org/en/scripts/407347-google-meet-helper
+// This fork: https://github.com/willsheppard/userscripts/blob/master/google-meet-helper.user.js
 
 // change the default values here
 const DISABLE_VIDEO = true;
